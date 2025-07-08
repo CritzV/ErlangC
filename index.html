@@ -1,42 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Erlang C WASM Demo</title>
+  <title>Erlang C WASM Debug Demo</title>
 </head>
 <body>
-  <h1>Erlang C Calculator (WebAssembly)</h1>
+  <h1>Erlang C Calculator (WASM)</h1>
 
   <button id="btnASA">Compute ASA</button>
   <button id="btnGOS">Compute GOS</button>
   <button id="btnOccupancy">Compute Occupancy</button>
   <button id="btnAgents">Compute Required Agents</button>
 
-  <pre id="output">Loading...</pre>
+  <pre id="output">Loading WASM...</pre>
 
   <script src="erlangc.js"></script>
   <script>
-    createErlangcModule().then((Module) => {
+    console.log("Starting to load WASM module...");
+
+    createErlangcModule().then(Module => {
+      console.log("WASM module loaded successfully:", Module);
+
       const output = document.getElementById('output');
+      output.innerText = 'WASM Loaded. Click any button.';
 
       const runASA = () => {
-        const result = Module._asa15(5, 20, 180);
-        output.innerText = 'ASA15: ' + result + ' seconds';
+        try {
+          console.log("Running ASA...");
+          const result = Module._asa15(5, 20, 180);
+          console.log("ASA Result:", result);
+          output.innerText = 'ASA15: ' + result + ' seconds';
+        } catch (err) {
+          console.error("ASA error:", err);
+          output.innerText = 'Error running ASA: ' + err;
+        }
       };
 
       const runGOS = () => {
-        const result = Module._gos15(5, 20, 60, 180);
-        output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
+        try {
+          console.log("Running GOS...");
+          const result = Module._gos15(5, 20, 60, 180);
+          console.log("GOS Result:", result);
+          output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
+        } catch (err) {
+          console.error("GOS error:", err);
+          output.innerText = 'Error running GOS: ' + err;
+        }
       };
 
       const runOccupancy = () => {
-        const result = Module._occupancy15(5, 20, 180);
-        output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
+        try {
+          console.log("Running Occupancy...");
+          const result = Module._occupancy15(5, 20, 180);
+          console.log("Occupancy Result:", result);
+          output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
+        } catch (err) {
+          console.error("Occupancy error:", err);
+          output.innerText = 'Error running Occupancy: ' + err;
+        }
       };
 
       const runRequiredAgents = () => {
-        const result = Module._requiredAgents15(20, 180, 0.9, 60);
-        output.innerText = 'Required Agents: ' + result;
+        try {
+          console.log("Running Required Agents...");
+          const result = Module._requiredAgents15(20, 180, 0.9, 60);
+          console.log("Required Agents Result:", result);
+          output.innerText = 'Required Agents: ' + result;
+        } catch (err) {
+          console.error("Required Agents error:", err);
+          output.innerText = 'Error running Required Agents: ' + err;
+        }
       };
 
       document.getElementById('btnASA').addEventListener('click', runASA);
@@ -44,7 +77,9 @@
       document.getElementById('btnOccupancy').addEventListener('click', runOccupancy);
       document.getElementById('btnAgents').addEventListener('click', runRequiredAgents);
 
-      output.innerText = 'WASM loaded. Ready.';
+    }).catch(err => {
+      console.error("Failed to load WASM module:", err);
+      document.getElementById('output').innerText = 'Failed to load WASM: ' + err;
     });
   </script>
 </body>
