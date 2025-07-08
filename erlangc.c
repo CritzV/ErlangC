@@ -62,7 +62,7 @@ static double sla(int agents, double serviceTimeSec, double callsPerHour, double
     double trafficRate = birthRate / deathRate;
 
     double utilisation = trafficRate / agents;
-    if (utilisation >= 1) utilisation = 0.99;
+    if (utilisation >= 1) utilisation = 0.99;   
 
     double C = erlangC(agents, trafficRate);
     double slQueued = 1 - C * exp((trafficRate - agents) * serviceTimeSec / ahtSeconds);
