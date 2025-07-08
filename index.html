@@ -6,43 +6,40 @@
 </head>
 <body>
   <h1>Erlang C Calculator (WASM)</h1>
-  <div>
-    <button onclick="runASA()">Compute ASA</button>
-    <button onclick="runGOS()">Compute GOS</button>
-    <button onclick="runOccupancy()">Compute Occupancy</button>
-    <button onclick="runRequiredAgents()">Compute Required Agents</button>
-  </div>
-  <pre id="output"></pre>
+
+  <button id="btnASA">Compute ASA</button>
+  <button id="btnGOS">Compute GOS</button>
+  <button id="btnOccupancy">Compute Occupancy</button>
+  <button id="btnAgents">Compute Required Agents</button>
+
+  <pre id="output">Loading WASM...</pre>
 
   <script src="erlangc.js"></script>
   <script>
-    let Module = {
-      onRuntimeInitialized: function() {
-        document.getElementById('output').innerText = 'WASM Loaded. Ready.';
-      }
-    };
+    createErlangcModule().then((Module) => {
+      const output = document.getElementById('output');
+      output.innerText = 'WASM Loaded. Ready.';
 
-    const output = document.getElementById('output');
+      document.getElementById('btnASA').onclick = () => {
+        const result = Module._asa15(5, 20, 180);
+        output.innerText = 'ASA15: ' + result + ' seconds';
+      };
 
-    function runASA() {
-      const result = Module.ccall('asa15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
-      output.innerText = 'ASA15: ' + result + ' seconds';
-    }
+      document.getElementById('btnGOS').onclick = () => {
+        const result = Module._gos15(5, 20, 60, 180);
+        output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
+      };
 
-    function runGOS() {
-      const result = Module.ccall('gos15', 'number', ['number', 'number', 'number', 'number'], [5, 20, 60, 180]);
-      output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
-    }
+      document.getElementById('btnOccupancy').onclick = () => {
+        const result = Module._occupancy15(5, 20, 180);
+        output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
+      };
 
-    function runOccupancy() {
-      const result = Module.ccall('occupancy15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
-      output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
-    }
-
-    function runRequiredAgents() {
-      const result = Module.ccall('requiredAgents15', 'number', ['number', 'number', 'number', 'number'], [20, 180, 0.9, 60]);
-      output.innerText = 'Required Agents: ' + result;
-    }
+      document.getElementById('btnAgents').onclick = () => {
+        const result = Module._requiredAgents15(20, 180, 0.9, 60);
+        output.innerText = 'Required Agents: ' + result;
+      };
+    });
   </script>
 </body>
 </html>
