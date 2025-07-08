@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Erlang C WASM Demo</title>
+</head>
+<body>
+  <h1>Erlang C Calculator (WASM)</h1>
+  <div>
+    <button onclick="runASA()">Compute ASA</button>
+    <button onclick="runGOS()">Compute GOS</button>
+    <button onclick="runOccupancy()">Compute Occupancy</button>
+    <button onclick="runRequiredAgents()">Compute Required Agents</button>
+  </div>
+  <pre id="output"></pre>
+
+  <script src="erlangc.js"></script>
+  <script>
+    let Module = {
+      onRuntimeInitialized: function() {
+        document.getElementById('output').innerText = 'WASM Loaded. Ready.';
+      }
+    };
+
+    const output = document.getElementById('output');
+
+    function runASA() {
+      const result = Module.ccall('asa15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
+      output.innerText = 'ASA15: ' + result + ' seconds';
+    }
+
+    function runGOS() {
+      const result = Module.ccall('gos15', 'number', ['number', 'number', 'number', 'number'], [5, 20, 60, 180]);
+      output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
+    }
+
+    function runOccupancy() {
+      const result = Module.ccall('occupancy15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
+      output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
+    }
+
+    function runRequiredAgents() {
+      const result = Module.ccall('requiredAgents15', 'number', ['number', 'number', 'number', 'number'], [20, 180, 0.9, 60]);
+      output.innerText = 'Required Agents: ' + result;
+    }
+  </script>
+</body>
+</html>
