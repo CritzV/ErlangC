@@ -5,40 +5,46 @@
   <title>Erlang C WASM Demo</title>
 </head>
 <body>
-  <h1>Erlang C Calculator (WASM)</h1>
+  <h1>Erlang C Calculator (WebAssembly)</h1>
 
   <button id="btnASA">Compute ASA</button>
   <button id="btnGOS">Compute GOS</button>
   <button id="btnOccupancy">Compute Occupancy</button>
   <button id="btnAgents">Compute Required Agents</button>
 
-  <pre id="output">Loading WASM...</pre>
+  <pre id="output">Loading...</pre>
 
   <script src="erlangc.js"></script>
   <script>
     createErlangcModule().then((Module) => {
       const output = document.getElementById('output');
-      output.innerText = 'WASM Loaded. Ready.';
 
-      document.getElementById('btnASA').onclick = () => {
+      const runASA = () => {
         const result = Module._asa15(5, 20, 180);
         output.innerText = 'ASA15: ' + result + ' seconds';
       };
 
-      document.getElementById('btnGOS').onclick = () => {
+      const runGOS = () => {
         const result = Module._gos15(5, 20, 60, 180);
         output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
       };
 
-      document.getElementById('btnOccupancy').onclick = () => {
+      const runOccupancy = () => {
         const result = Module._occupancy15(5, 20, 180);
         output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
       };
 
-      document.getElementById('btnAgents').onclick = () => {
+      const runRequiredAgents = () => {
         const result = Module._requiredAgents15(20, 180, 0.9, 60);
         output.innerText = 'Required Agents: ' + result;
       };
+
+      document.getElementById('btnASA').addEventListener('click', runASA);
+      document.getElementById('btnGOS').addEventListener('click', runGOS);
+      document.getElementById('btnOccupancy').addEventListener('click', runOccupancy);
+      document.getElementById('btnAgents').addEventListener('click', runRequiredAgents);
+
+      output.innerText = 'WASM loaded. Ready.';
     });
   </script>
 </body>
