@@ -2,71 +2,58 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Erlang C WASM Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
-    h1 { font-size: 24px; }
-    button { margin: 5px; padding: 10px 20px; }
-    #output { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; min-height: 30px; }
-  </style>
+  <title>Erlang C WebAssembly Demo</title>
 </head>
 <body>
-  <h1>Erlang C WASM Demo v0.02</h1>
+  <h1>Erlang C WebAssembly Demo v0.3</h1>
 
-  <button id="btnASA">Run ASA</button>
-  <button id="btnGOS">Run GOS</button>
-  <button id="btnOccupancy">Run Occupancy</button>
-  <button id="btnAgents">Run Required Agents</button>
+  <button onclick="runASA()">Run ASA</button>
+  <button onclick="runGOS()">Run GOS</button>
+  <button onclick="runOccupancy()">Run Occupancy</button>
+  <button onclick="runRequiredAgents()">Run Required Agents</button>
 
-  <div id="output">Loading WASM...</div>
+  <div id="output"></div>
 
   <script src="erlangc.js"></script>
   <script>
-    console.log("Initializing WASM module...");
+    let Module = null;
 
-    createModule().then(Module => {
-      console.log("WASM module loaded:", Module);
-
-      const output = document.getElementById('output');
-      output.innerText = 'WASM Loaded. Click a button to test.';
-
-      const runASA = () => {
-        console.log("Running ASA...");
-        const result = Module._asa15(5, 20, 180);
-        console.log("ASA result:", result);
-        output.innerText = 'ASA15: ' + result + ' seconds';
-      };
-
-      const runGOS = () => {
-        console.log("Running GOS...");
-        const result = Module._gos15(5, 20, 60, 180);
-        console.log("GOS result:", result);
-        output.innerText = 'GOS15: ' + (result * 100).toFixed(2) + '%';
-      };
-
-      const runOccupancy = () => {
-        console.log("Running Occupancy...");
-        const result = Module._occupancy15(5, 20, 180);
-        console.log("Occupancy result:", result);
-        output.innerText = 'Occupancy15: ' + (result * 100).toFixed(2) + '%';
-      };
-
-      const runRequiredAgents = () => {
-        console.log("Running Required Agents...");
-        const result = Module._requiredAgents15(20, 180, 0.9, 60);
-        console.log("Required Agents result:", result);
-        output.innerText = 'Required Agents: ' + result;
-      };
-
-      document.getElementById('btnASA').addEventListener('click', runASA);
-      document.getElementById('btnGOS').addEventListener('click', runGOS);
-      document.getElementById('btnOccupancy').addEventListener('click', runOccupancy);
-      document.getElementById('btnAgents').addEventListener('click', runRequiredAgents);
-
-    }).catch(err => {
-      console.error("WASM module failed to load:", err);
-      document.getElementById('output').innerText = 'Error loading WASM: ' + err;
+    createErlangcModule().then(instance => {
+      Module = instance;
+      console.log("WASM Module Loaded");
     });
+
+    function runASA() {
+      if (!Module) return console.log("WASM not ready");
+
+      const result = Module.ccall('asa15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
+      document.getElementById('output').innerHTML = `ASA15: ${result} seconds`;
+      console.log("ASA15:", result);
+    }
+
+    function runGOS() {
+      if (!Module) return console.log("WASM not ready");
+
+      const result = Module.ccall('gos15', 'number', ['number', 'number', 'number', 'number'], [5, 20, 60, 180]);
+      document.getElementById('output').innerHTML = `GOS15: ${(result * 100).toFixed(2)}%`;
+      console.log("GOS15:", result);
+    }
+
+    function runOccupancy() {
+      if (!Module) return console.log("WASM not ready");
+
+      const result = Module.ccall('occupancy15', 'number', ['number', 'number', 'number'], [5, 20, 180]);
+      document.getElementById('output').innerHTML = `Occupancy15: ${(result * 100).toFixed(2)}%`;
+      console.log("Occupancy15:", result);
+    }
+
+    function runRequiredAgents() {
+      if (!Module) return console.log("WASM not ready");
+
+      const result = Module.ccall('requiredAgents15', 'number', ['number', 'number', 'number', 'number'], [20, 180, 0.9, 60]);
+      document.getElementById('output').innerHTML = `Required Agents: ${result}`;
+      console.log("Required Agents:", result);
+    }
   </script>
 </body>
 </html>
